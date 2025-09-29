@@ -8,27 +8,14 @@ return [
     |--------------------------------------------------------------------------
     | Default Database Connection Name
     |--------------------------------------------------------------------------
-    |
-    | Here you may specify which of the database connections below you wish
-    | to use as your default connection for database operations. This is
-    | the connection which will be utilized unless another connection
-    | is explicitly specified when you execute a query / statement.
-    |
     */
-
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'oracle'),
 
     /*
     |--------------------------------------------------------------------------
     | Database Connections
     |--------------------------------------------------------------------------
-    |
-    | Below are all of the database connections defined for your application.
-    | An example configuration is provided for each database system which
-    | is supported by Laravel. You're free to add / remove connections.
-    |
     */
-
     'connections' => [
 
         'sqlite' => [
@@ -114,22 +101,24 @@ return [
         ],
 
         'oracle' => [
-            'driver'         => 'oracle',
-            'tns'            => env('DB_TNS', ''),
-            'host'           => env('DB_HOST', ''),
-            'port'           => env('DB_PORT', '1521'),
-            'database'       => env('DB_DATABASE', ''),
-            'service_name'   => env('DB_SERVICE_NAME', ''),
-            'username'       => env('DB_USERNAME', ''),
-            'password'       => env('DB_PASSWORD', ''),
-            'charset'        => env('DB_CHARSET', 'AL32UTF8'),
-            'prefix'         => env('DB_PREFIX', ''),
-            'prefix_schema'  => env('DB_SCHEMA_PREFIX', ''),
-            'edition'        => env('DB_EDITION', 'ora$base'),
-            'server_version' => env('DB_SERVER_VERSION', '11g'),
-            'load_balance'   => env('DB_LOAD_BALANCE', 'yes'),
-            'dynamic'        => [],
-            'max_name_len'   => env('ORA_MAX_NAME_LEN', 30),
+            'driver'        => 'oracle',
+            'host'          => env('DB_HOST', '127.0.0.1'),
+            'port'          => env('DB_PORT', '1521'),
+            'service_name'  => env('DB_SERVICE_NAME', ''),
+            'database'      => env('DB_DATABASE', ''),
+            'username'      => env('DB_USERNAME', ''),
+            'password'      => env('DB_PASSWORD', ''),
+            'charset'       => env('DB_CHARSET', 'AL32UTF8'),
+            'prefix'        => env('DB_PREFIX', ''),
+            'prefix_schema' => env('DB_SCHEMA_PREFIX', ''),
+
+            'sessionVars'   => [
+                'NLS_TIME_FORMAT'          => 'HH24:MI:SS',
+                'NLS_DATE_FORMAT'          => 'YYYY-MM-DD HH24:MI:SS',
+                'NLS_TIMESTAMP_FORMAT'     => 'YYYY-MM-DD HH24:MI:SS',
+                'NLS_TIMESTAMP_TZ_FORMAT'  => 'YYYY-MM-DD HH24:MI:SS TZH:TZM',
+                'NLS_NUMERIC_CHARACTERS'   => '.,',
+            ],
         ],
 
     ],
@@ -138,13 +127,7 @@ return [
     |--------------------------------------------------------------------------
     | Migration Repository Table
     |--------------------------------------------------------------------------
-    |
-    | This table keeps track of all the migrations that have already run for
-    | your application. Using this information, we can determine which of
-    | the migrations on disk haven't actually been run on the database.
-    |
     */
-
     'migrations' => [
         'table' => 'migrations',
         'update_date_on_publish' => true,
@@ -154,13 +137,7 @@ return [
     |--------------------------------------------------------------------------
     | Redis Databases
     |--------------------------------------------------------------------------
-    |
-    | Redis is an open source, fast, and advanced key-value store that also
-    | provides a richer body of commands than a typical key-value system
-    | such as Memcached. You may define your connection settings here.
-    |
     */
-
     'redis' => [
 
         'client' => env('REDIS_CLIENT', 'phpredis'),
@@ -198,5 +175,4 @@ return [
         ],
 
     ],
-
 ];
