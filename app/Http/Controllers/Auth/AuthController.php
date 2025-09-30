@@ -91,7 +91,7 @@ class AuthController extends Controller
     public function dashboard(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return view('dashboard');
+            return view('backoffice.dashboard');
         }
         return redirect()->route('login')->with('error', 'กรุณาเข้าสู่ระบบก่อน');
     }
