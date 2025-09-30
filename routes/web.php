@@ -145,11 +145,10 @@ Route::prefix('backoffice')->group(function () {
          Route::prefix('trips')->middleware('position.menu:trips_manage')->group(function () {
             Route::view('/', 'backoffice.trips');
             Route::get('/data', [TripController::class, 'data']);
+            Route::get('/init', [TripController::class, 'init']);
             Route::get('/{id}', [TripController::class, 'show']);
             Route::post('/', [TripController::class, 'store']);
             Route::put('/{id}', [TripController::class, 'update']);
             Route::delete('/{id}', [TripController::class, 'destroy']);
-            // Init lists for dropdowns
-            Route::get('/init', [TripController::class, 'init']);
         });
 });

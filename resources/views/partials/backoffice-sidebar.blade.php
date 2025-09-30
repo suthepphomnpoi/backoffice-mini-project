@@ -1,4 +1,4 @@
- <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark" style="background: #1e293b; color: #fff;">
+<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark" style="background: #1e293b; color: #fff;">
      <div class="sidebar-brand py-3 px-3 mb-2" style="background: #fff; border-radius: 0.75rem; margin: 1rem;">
          <a href="/backoffice" class="brand-link d-flex align-items-center gap-2" style="color: #2563eb; font-size: 1.4rem; font-weight: 700;">
              <i class="bi bi-bus-front-fill" style="font-size: 2rem; color: #2563eb;"></i>
@@ -13,7 +13,7 @@
 
 
 
-                @if (canMenu('dashboard'))
+                @if(canMenu('dashboard'))
                 <li class="nav-item">
                     <a href="/backoffice" class="nav-link {{ request()->is('backoffice') ? 'active' : '' }} d-flex align-items-center gap-2">
                         <i class="nav-icon ti ti-dashboard" style="font-size: 1.2rem;"></i>
@@ -22,7 +22,7 @@
                 </li>
                 @endif
 
-                @if (canMenu('user_manage'))
+                @if(canMenu('user_manage'))
                 <li class="nav-item">
                     <a href="/backoffice/users"
                         class="nav-link {{ request()->is('backoffice/users*') ? 'active' : '' }} d-flex align-items-center gap-2">
@@ -41,7 +41,7 @@
                 </li>
                 @endif
 
-                @if (canMenu('department_position_manage'))
+                @if(canMenu('department_position_manage'))
                 <li class="nav-item">
                     <a href="/backoffice/org" class="nav-link {{ (request()->is('backoffice/org') || request()->is('backoffice/departments*') || request()->is('backoffice/positions*')) ? 'active' : '' }} d-flex align-items-center gap-2">
                         <i class="nav-icon ti ti-hierarchy-3" style="font-size: 1.2rem;"></i>
