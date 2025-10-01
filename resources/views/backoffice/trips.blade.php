@@ -14,6 +14,7 @@
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
+                            <th>รอบ</th>
                             <th>วันที่</th>
                             <th>เวลา</th>
                             <th>เส้นทาง</th>
@@ -39,6 +40,10 @@
                 <div class="modal-body">
                     <form id="tripForm">
                         <input type="hidden" id="trip_id">
+                        <div class="mb-3">
+                            <label class="form-label">รอบ</label>
+                            <input type="number" min="1" class="form-control" id="round_no" name="round_no" placeholder="ปล่อยว่างให้ระบบกำหนดอัตโนมัติ">
+                        </div>
                         <div class="mb-3">
                             <label class="form-label">วันที่</label>
                             <input type="date" class="form-control" id="service_date" name="service_date" required>
@@ -100,6 +105,7 @@
                     ajax: { url: '{{ url('backoffice/trips/data') }}', type: 'GET' },
                     columns: [
                         { data: 'trip_id', width: 60 },
+                        { data: 'round_no', width: 60, render: function(data){ return data ? data : ''; } },
                         { data: 'service_date' },
                         { data: 'depart_time' },
                         { data: 'route_name' },
@@ -166,6 +172,7 @@
                         $('#trip_id').val(res.trip_id);
                         $('#service_date').val(res.service_date?.substring(0,10));
                         $('#depart_time').val(res.depart_time);
+                        $('#round_no').val(res.round_no ?? '');
                         $('#capacity').val(res.capacity);
                         $('#reserved_seats').val(res.reserved_seats ?? 0);
                         $('#status').val(res.status);
@@ -179,9 +186,11 @@
                 $('#btnSaveTrip').on('click', function(){
                     const id = $('#trip_id').val();
                     const btn = this; startBtnLoading(btn,'กำลังบันทึก...');
+                    const roundNoVal = $('#round_no').val();
                     const payload = {
                         service_date: $('#service_date').val(),
                         depart_time: $('#depart_time').val(),
+                        ...(roundNoVal && !isNaN(roundNoVal) ? { round_no: roundNoVal } : {}),
                         route_id: $('#route_id').val(),
                         vehicle_id: $('#vehicle_id').val(),
                         driver_id: $('#driver_id').val(),
