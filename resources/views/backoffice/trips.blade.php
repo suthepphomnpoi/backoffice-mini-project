@@ -63,10 +63,10 @@
                             <label class="form-label">จำนวนที่นั่ง</label>
                             <input type="number" min="1" class="form-control" id="capacity" name="capacity" required>
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label class="form-label">จองแล้ว</label>
                             <input type="number" min="0" class="form-control" id="reserved_seats" name="reserved_seats" value="0">
-                        </div>
+                        </div> --}}
                         <div class="mb-3">
                             <label class="form-label">สถานะ</label>
                             <select class="form-select" id="status" name="status" required>
@@ -124,10 +124,30 @@
                         $('#route_id').html(`<option value="">-- เลือก --</option>`+rOpts);
                         $('#vehicle_id').html(`<option value="">-- เลือก --</option>`+vOpts);
                         $('#driver_id').html(`<option value="">-- เลือก --</option>`+dOpts);
+
                         if (selected){
                             $('#route_id').val(selected.route_id);
                             $('#vehicle_id').val(selected.vehicle_id);
-                            $('#driver_id').val(selected.driver_id);
+
+                            // If selected driver exists in the list, select it. If not, fetch that single employee and append.
+                            const selDriverId = selected.driver_id;
+                            if (selDriverId) {
+                                if ($('#driver_id option[value="'+selDriverId+'"]').length) {
+                                    $('#driver_id').val(selDriverId);
+                                } else {
+                                    // fetch single employee and append
+                                    $.get(`{{ url('backoffice/employees') }}/${selDriverId}`, emp => {
+                                        if (emp && emp.employee_id) {
+                                            const name = (emp.first_name || '') + ' ' + (emp.last_name || '');
+                                            $('#driver_id').append(`<option value="${emp.employee_id}">${escapeHtml(name)}</option>`);
+                                            $('#driver_id').val(emp.employee_id);
+                                        }
+                                    }).fail(()=>{
+                                        // fallback: clear selection
+                                        $('#driver_id').val('');
+                                    });
+                                }
+                            }
                         }
                     });
                 }

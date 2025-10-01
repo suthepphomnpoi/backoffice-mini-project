@@ -7,6 +7,7 @@ use App\Models\MpTrip;
 use App\Models\MpRoute;
 use App\Models\MpVehicle;
 use App\Models\MpEmployee;
+use App\Models\MpPosition;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
@@ -18,7 +19,18 @@ class TripController extends Controller
     {
         $routes = MpRoute::select(['route_id','name'])->orderBy('name')->get();
         $vehicles = MpVehicle::select(['vehicle_id','license_plate'])->orderBy('license_plate')->get();
-        $drivers = MpEmployee::select(['employee_id','first_name','last_name'])->orderBy('first_name')->get()
+        // Only include employees whose position name indicates they are drivers.
+        // Match common English/Thai names: 'driver' or 'คนขับ' (case-insensitive).
+        $driverPositionIds = MpPosition::query()
+            ->whereRaw("lower(name) like ?", ['%driver%'])
+            ->orWhere('name', 'like', '%คนขับ%')
+            ->pluck('position_id')
+            ->all();
+
+        $drivers = MpEmployee::select(['employee_id','first_name','last_name'])
+            ->whereIn('position_id', $driverPositionIds ?: [0])
+            ->orderBy('first_name')
+            ->get()
             ->map(fn($e)=>[
                 'employee_id' => $e->employee_id,
                 'name' => $e->first_name.' '.$e->last_name,
