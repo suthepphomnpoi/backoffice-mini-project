@@ -3,47 +3,66 @@
 namespace App\Http\Controllers\BackOffice;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
+use App\Models\MpTrip;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function dashboardPage()
+    /**
+     * Show dashboard report using mp_trips data.
+     * We aggregate trips by vehicle type and license plate for the current month.
+     */
+    public function dashboardPage(Request $request)
     {
-        $months = [
-            '01' => 'ม.ค.',
-            '02' => 'ก.พ.',
-            '03' => 'มี.ค.',
-            '04' => 'เม.ย.',
-            '05' => 'พ.ค.',
-            '06' => 'มิ.ย.',
-            '07' => 'ก.ค.',
-            '08' => 'ส.ค.',
-            '09' => 'ก.ย.',
-            '10' => 'ต.ค.',
-            '11' => 'พ.ย.',
-            '12' => 'ธ.ค.'
-        ];
+        $start = Carbon::now()->startOfMonth()->toDateString();
+        $end = Carbon::now()->endOfMonth()->toDateString();
 
-        // ดึงข้อมูลจาก MP_EMPLOYEES
-        $employees = DB::table('mp_employees')
-            ->select('first_name', 'last_name', 'created_at')
+        // load trips within current month with related vehicle and type
+        $trips = MpTrip::with(['vehicle.type'])
+            ->whereBetween('service_date', [$start, $end])
             ->get();
 
-        // นับจำนวนผู้ใช้ตามเดือน จาก MP_EMPLOYEES
-        $userCountsByMonth = DB::table('MP_EMPLOYEES')
-            ->selectRaw("TO_CHAR(CREATED_AT, 'MM') as month, COUNT(*) as count")
-            ->whereRaw("EXTRACT(YEAR FROM CREATED_AT) = ?", [now()->year])
-            ->groupByRaw("TO_CHAR(CREATED_AT, 'MM')")
-            ->orderByRaw("TO_CHAR(CREATED_AT, 'MM')")
-            ->pluck('count', 'month')
-            ->toArray();
+        // aggregate: [ typeName => [ 'vehicles' => [plate => count], 'total' => int ] ]
+        $types = [];
+        foreach ($trips as $trip) {
+            $vehicle = $trip->vehicle;
+            $typeName = 'ไม่ระบุประเภท';
+            $plate = 'ไม่ระบุ';
 
-        // map เดือนที่ไม่มีข้อมูล = 0
-        $userCountsByMonthFull = [];
-        foreach ($months as $num => $name) {
-            $userCountsByMonthFull[$name] = $userCountsByMonth[$num] ?? 0;
+            if ($vehicle) {
+                $plate = $vehicle->license_plate ?? $plate;
+                if ($vehicle->type && $vehicle->type->name) {
+                    $typeName = $vehicle->type->name;
+                }
+            }
+
+            if (!isset($types[$typeName])) {
+                $types[$typeName] = ['vehicles' => [], 'total' => 0];
+            }
+
+            if (!isset($types[$typeName]['vehicles'][$plate])) {
+                $types[$typeName]['vehicles'][$plate] = 0;
+            }
+
+            $types[$typeName]['vehicles'][$plate]++;
+            $types[$typeName]['total']++;
         }
 
-        return view('backoffice.dashboard', compact('employees', 'userCountsByMonthFull'));
+        // prepare flat rows for the table
+        $rows = [];
+        foreach ($types as $typeName => $data) {
+            foreach ($data['vehicles'] as $plate => $count) {
+                $rows[] = [
+                    'type' => $typeName,
+                    'plate' => $plate,
+                    'count' => $count,
+                ];
+            }
+        }
+
+        $grandTotal = array_sum(array_column($types, 'total'));
+
+        return view('backoffice.dashboard', compact('rows', 'types', 'grandTotal', 'start', 'end'));
     }
 }
