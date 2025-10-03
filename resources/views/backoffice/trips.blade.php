@@ -216,6 +216,17 @@
                         $.ajax({ url:`{{ url('backoffice/trips') }}/${id}`, type:'DELETE', success:()=>{ tTable.ajax.reload(null,false); showSwalSuccess('ลบสำเร็จ'); }, error:()=> showSwalError('Error') });
                     });
                 });
+
+                $('#vehicle_id').on('change', function() {
+                    const vehicleId = $(this).val();
+                    if (vehicleId) {
+                        $.get(`{{ url('backoffice/vehicles') }}/${vehicleId}`, res => {
+                            $('#capacity').val(res.capacity);
+                        });
+                    } else {
+                        $('#capacity').val('');
+                    }
+                });
             });
         </script>
     @endpush

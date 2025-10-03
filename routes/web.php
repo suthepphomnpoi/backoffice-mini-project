@@ -150,4 +150,8 @@ Route::prefix('backoffice')->group(function () {
         Route::put('/{id}', [TripController::class, 'update']);
         Route::delete('/{id}', [TripController::class, 'destroy']);
     });
+
+    // รายงานสรุปยอดผู้ใช้แต่ละเส้นทางรายวัน
+    Route::get('/reports/route-usage-daily', [DashboardController::class, 'routeUsageDaily'])
+        ->middleware('position.menu:dashboard');
 });
